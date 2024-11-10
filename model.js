@@ -1,8 +1,18 @@
 const scale = 0.6;
 const pi = Math.PI;
+
 const a = 1;
 const teta = 0;
 const r = 2;
+
+// const a = 1;
+// const teta = 0;
+// const r = 1;
+
+// const a = 1;
+// const teta = 0.25 * pi;
+// const r = 2;
+
 const COUNT_POINTS = 60;
 const step_u = 2 * pi / COUNT_POINTS;
 const step_v = 2 * pi / COUNT_POINTS;
