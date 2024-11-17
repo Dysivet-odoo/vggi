@@ -33,32 +33,59 @@ const r = 2;
 // const teta = 0.25 * pi;
 // const r = 2;
 
-const COUNT_POINTS = 70;
+const COUNT_POINTS_U = 60;
+const COUNT_POINTS_V = 60;
 
 
-function buildPointTriangle(vertexList, triangleList, vertex, u_index, isLastRow)
-{
+function createTriangle(vertexList, triangleList, vertex, index_point_1, index_point_2){
     let count_points = vertexList.length;
     let count_triangles = triangleList.length;
-    if (isLastRow){
-        index_point_1 = count_points - COUNT_POINTS * (COUNT_POINTS - 1);
-        index_point_2 = count_points - COUNT_POINTS * (COUNT_POINTS - 1) + 1;
-    } else {
-        index_point_1 = count_points - COUNT_POINTS;
-        index_point_2 = count_points - COUNT_POINTS + 1;
-    }
     let t = new Triangle(count_points, index_point_1, index_point_2);
     vertexList[index_point_1].triangles.push(count_triangles);
     vertexList[index_point_2].triangles.push(count_triangles);
     vertex.triangles.push(count_triangles);
     triangleList.push(t);
+}
+
+function buildPointTriangle(vertexList, triangleList, vertex, u_index, isLastRow)
+{
+    let count_points = vertexList.length;
+    if (isLastRow){
+        // First    Last    --OR--    First    Last
+        //    o ... o                    o ... o
+        //    o ... o                    2 ... o
+        //    2 ... o                    1 ... S
+        //    1 ... S                    o ... o
+        index_point_1 = count_points - COUNT_POINTS_U * (COUNT_POINTS_V - 1);
+        index_point_2 = count_points - COUNT_POINTS_U * (COUNT_POINTS_V - 1) + 1;
+    } else {
+        //  Prev Current     --OR--     Prev Current
+        //    o   o                       o   o
+        //    o   o                       2   o
+        //    2   o                       1   S
+        //    1   S                       o   o
+        index_point_1 = count_points - COUNT_POINTS_U;
+        index_point_2 = count_points - COUNT_POINTS_U + 1;
+    }
+    createTriangle(vertexList, triangleList, vertex, index_point_1, index_point_2);
     if (u_index != 0){
+        //  Prev Current
+        //    o   o
+        //    o   o
+        //    2   S
+        //    o   3
         index_point_3 = count_points - 1;
-        let t1 = new Triangle(count_points, index_point_1, index_point_3);
-        vertexList[index_point_1].triangles.push(count_triangles+1);
-        vertexList[index_point_3].triangles.push(count_triangles+1);
-        vertex.triangles.push(count_triangles+1);
-        triangleList.push(t1);
+        createTriangle(vertexList, triangleList, vertex, index_point_1, index_point_3);
+    }
+    if (u_index == COUNT_POINTS_U - 1){
+        //  Prev Current
+        //    o   S
+        //    o   o
+        //    o   o
+        //    2   1
+        index_point_1 = count_points - COUNT_POINTS_U + 1;
+        index_point_2 = count_points - 2 * COUNT_POINTS_U + 1;
+        createTriangle(vertexList, triangleList, vertex, index_point_1, index_point_2);
     }
 }
 
@@ -70,15 +97,17 @@ function CreateSurfaceData(polylinesU, polylinesV)
     for(let v_index=0; v_index<polylinesV.length; v_index++){
         for(let u_index=0; u_index<polylinesU.length; u_index++){
             let vertex = new Vertex(getVector(polylinesU[u_index], polylinesV[v_index]));
-            if(v_index != 0) {
+            if(v_index != 0) { // First line skipping (cannot build triangles for first line)
                 buildPointTriangle(vertexList, triangleList, vertex, u_index, false);
             }
-            if(v_index == polylinesV.length - 1) {
+            if(v_index == polylinesV.length - 1) { // Connect last line with fisrt line
                 buildPointTriangle(vertexList, triangleList, vertex, u_index, true);
             }
             vertexList.push(vertex);
         }
     }
+
+    calculateNormals(vertexList, triangleList);
 
     verticesF32 = new Float32Array(vertexList.length*3);
     for (let i=0; i<vertexList.length; i++)
@@ -117,13 +146,36 @@ function getVector(u, v){
 }
 
 
-function getPolylines(min, max){
-    let step = (max - min) / COUNT_POINTS;
+function getPolylines(min, max, count){
+    let step = (max - min) / count;
     let list = [];
-    for(let i=0; i<=COUNT_POINTS; i++){
+    for(let i=0; i<count; i++){
         list.push(min + i * step);
     }
     return list;
+}
+
+function calculateNormals(vertexList, triangleList){
+    for (let i=0; i<triangleList.length; i++){
+        let t = triangleList[i];
+        let p0 = vertexList[t.v0].p;
+        let p1 = vertexList[t.v1].p;
+        let p2 = vertexList[t.v2].p;
+        
+        let v1 = m4.subtractVectors(p1, p0);
+        let v2 = m4.subtractVectors(p2, p0);
+        triangleList[i].normal = m4.cross(v1, v2);
+    }
+    console.log(triangleList);
+    // vertex normal facet average
+    for (let i=0; i<vertexList.length; i++){
+        let normal = [0,0,0];
+        for(const t of vertexList[i].triangles){
+            normal = m4.addVectors(normal, triangleList[t].normal);
+        }
+        vertexList[i].normal = normal;
+    }
+    console.log(vertexList);
 }
 
 // Constructor
@@ -132,8 +184,8 @@ function Model(name) {
     this.iVertexBuffer = gl.createBuffer();
     this.iIndexBuffer = gl.createBuffer();
     this.count = 0;
-    this.u_polylines = getPolylines(-pi, pi);
-    this.v_polylines = getPolylines(0, 2*pi);
+    this.u_polylines = getPolylines(-pi, pi, COUNT_POINTS_U);
+    this.v_polylines = getPolylines(0, 2*pi, COUNT_POINTS_V);
 
     this.BufferData = function() {
         let data = CreateSurfaceData(this.u_polylines, this.v_polylines);
