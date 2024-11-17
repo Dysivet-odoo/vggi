@@ -52,18 +52,18 @@ function buildPointTriangle(vertexList, triangleList, vertex, u_index, isLastRow
     let count_points = vertexList.length;
     if (isLastRow){
         // First    Last    --OR--    First    Last
+        //    o ... o                    1 ... S
         //    o ... o                    o ... o
-        //    o ... o                    2 ... o
-        //    2 ... o                    1 ... S
-        //    1 ... S                    o ... o
+        //    2 ... o                    o ... o
+        //    1 ... S                    o ... 2
         index_point_1 = count_points - COUNT_POINTS_U * (COUNT_POINTS_V - 1);
         index_point_2 = count_points - COUNT_POINTS_U * (COUNT_POINTS_V - 1) + 1;
     } else {
         //  Prev Current     --OR--     Prev Current
+        //    o   o                       1   S
         //    o   o                       o   o
-        //    o   o                       2   o
-        //    2   o                       1   S
-        //    1   S                       o   o
+        //    2   o                       o   o
+        //    1   S                       o   2
         index_point_1 = count_points - COUNT_POINTS_U;
         index_point_2 = count_points - COUNT_POINTS_U + 1;
     }
