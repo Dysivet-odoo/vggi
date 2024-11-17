@@ -205,6 +205,9 @@ function Model(name) {
 
         // (C - A) x (B - A)
 
+        // Phong --- інтерполяція нормалей
+        // https://youtu.be/stegQLPdIEg?si=myhw3UJIyjviXMlm    +- 48:00
+
         this.count = indicesU16.length;
     }
 
