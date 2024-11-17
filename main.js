@@ -70,12 +70,8 @@ function initGL() {
     shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(prog, "ModelViewProjectionMatrix");
     shProgram.iColor                     = gl.getUniformLocation(prog, "color");
 
-    let data = {};
-    
-    CreateSurfaceData(data)
-
     surface = new Model('Surface');
-    surface.BufferData(data.verticesF32, data.indicesU16);
+    surface.BufferData();
 
     gl.enable(gl.DEPTH_TEST);
 }
