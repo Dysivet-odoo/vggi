@@ -49,7 +49,13 @@ function draw() {
        combined transformation matrix, and send that to the shader program. */
     let modelViewProjection = m4.multiply(projection, matAccum1 );
 
+    // My
+    const normalMatrix = m4.identity();
+    m4.inverse(modelView, normalMatrix);
+    m4.transpose(normalMatrix, normalMatrix);
+
     gl.uniformMatrix4fv(shProgram.iModelViewProjectionMatrix, false, modelViewProjection );
+    gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalMatrix);
     
     /* Draw the six faces of a cube, with different colors. */
     gl.uniform4fv(shProgram.iColor, [1,1,0,1] );
@@ -68,7 +74,9 @@ function initGL() {
 
     shProgram.iAttribVertex              = gl.getAttribLocation(prog, "vertex");
     shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(prog, "ModelViewProjectionMatrix");
+    shProgram.iNormalMatrix              = gl.getUniformLocation(prog, "normalMatrix");
     shProgram.iColor                     = gl.getUniformLocation(prog, "color");
+    shProgram.iVertexNormal              = gl.getAttribLocation(prog, "normal");
 
     surface = new Model('Surface');
     surface.BufferData();
