@@ -8,7 +8,6 @@ function Vertex(p, uv)
     this.p = p;
     this.uv = uv;
     this.normal = [];
-    this.my_normal = []
 }
 
 function Triangle(v0, v1, v2)
