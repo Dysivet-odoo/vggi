@@ -16,7 +16,6 @@ function updateLightPosition() {
     let lightY = 10.0; 
     let lightZ = lightRadius * Math.sin(lightAngle);  
  
-    // Надіслати нову позицію до шейдера 
     gl.uniform3fv(shProgram.iLightSource, [lightX, lightY, lightZ]); 
 } 
  
