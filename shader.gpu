@@ -6,29 +6,13 @@ attribute vec3 vertex;
 attribute vec3 normal;
 
 uniform mat4 ModelViewProjectionMatrix;
-uniform mat4 normalMatrix;
 
 varying vec3 var_position;
 varying vec3 var_normal;
-varying vec3 var_lightsource;
-
-// varying vec3 toV;
-// varying vec3 toL;
-// varying vec3 normale;
-
-// uniform vec3 lPos;
-// varying vec3 lPose;
 
 void main() {
-    vec3 lightPos = vec3(100.0, 100.0, -100.0);
-    var_lightsource = lightPos;
     var_normal = normal;
     var_position = vertex;
-
-    // toV = mat3(ModelViewProjectionMatrix)*-vertex;
-    // lPose = mat3(ModelViewProjectionMatrix)*lPos;
-    // toL = lPose-mat3(ModelViewProjectionMatrix)*vertex;
-    // normale = mat3(normalMatrix)*-normal;
 
     gl_Position = ModelViewProjectionMatrix * vec4(vertex,1.0);
 }`;
@@ -44,12 +28,11 @@ const fragmentShaderSource = `
 
 varying vec3 var_position;
 varying vec3 var_normal;
-varying vec3 var_lightsource;
 uniform vec4 color;
+uniform vec3 lightPos;
 
 void main() {
-    vec3 lightPos = vec3(1.0, 1.0, -1.0);
-    vec3 viewerPos = vec3(0.0, 0.0, 1.0);
+    vec3 viewerPos = vec3(10.0, 0.0, 10.0);
     float shininess = 80.0;
     float kA = 1.0;
     float kD = 1.0;

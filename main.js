@@ -6,6 +6,28 @@ let shProgram;                  // A shader program
 let spaceball;                  // A SimpleRotator object that lets the user rotate the view by mouse.
 
 
+let lightAngle = 0; 
+let lightRadius = 20.0; 
+
+function updateLightPosition() { 
+    lightAngle += 0.01; 
+     
+    let lightX = lightRadius * Math.cos(lightAngle); 
+    let lightY = 10.0; 
+    let lightZ = lightRadius * Math.sin(lightAngle);  
+ 
+    // Надіслати нову позицію до шейдера 
+    gl.uniform3fv(shProgram.iLightSource, [lightX, lightY, lightZ]); 
+} 
+ 
+function animate() { 
+    let count_u = parseFloat(document.getElementById('u').value);
+    let count_v = parseFloat(document.getElementById('v').value);
+    initGL(count_u, count_v);  // initialize the WebGL graphics context
+    draw(); 
+    requestAnimationFrame(animate);  
+}
+
 // Constructor
 function ShaderProgram(name, program) {
 
@@ -49,13 +71,9 @@ function draw() {
        combined transformation matrix, and send that to the shader program. */
     let modelViewProjection = m4.multiply(projection, matAccum1 );
 
-    // My
-    const normalMatrix = m4.identity();
-    m4.inverse(modelView, normalMatrix);
-    m4.transpose(normalMatrix, normalMatrix);
-
     gl.uniformMatrix4fv(shProgram.iModelViewProjectionMatrix, false, modelViewProjection );
-    gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalMatrix);
+
+    updateLightPosition();
     
     /* Draw the six faces of a cube, with different colors. */
     gl.uniform4fv(shProgram.iColor, [1,1,0,1] );
@@ -66,7 +84,7 @@ function draw() {
 
 
 /* Initialize the WebGL context. Called from init() */
-function initGL() {
+function initGL(count_u, count_v) {
     let prog = createProgram( gl, vertexShaderSource, fragmentShaderSource );
 
     shProgram = new ShaderProgram('Basic', prog);
@@ -74,11 +92,11 @@ function initGL() {
 
     shProgram.iAttribVertex              = gl.getAttribLocation(prog, "vertex");
     shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(prog, "ModelViewProjectionMatrix");
-    shProgram.iNormalMatrix              = gl.getUniformLocation(prog, "normalMatrix");
     shProgram.iColor                     = gl.getUniformLocation(prog, "color");
     shProgram.iVertexNormal              = gl.getAttribLocation(prog, "normal");
+    shProgram.iLightSource               = gl.getUniformLocation(prog, "lightPos");
 
-    surface = new Model('Surface');
+    surface = new Model('Surface', count_u, count_v);
     surface.BufferData();
 
     gl.enable(gl.DEPTH_TEST);
@@ -135,7 +153,9 @@ function init() {
         return;
     }
     try {
-        initGL();  // initialize the WebGL graphics context
+        let count_u = parseFloat(document.getElementById('u').value);
+        let count_v = parseFloat(document.getElementById('v').value);
+        initGL(count_u, count_v);  // initialize the WebGL graphics context
     }
     catch (e) {
         document.getElementById("canvas-holder").innerHTML =
@@ -146,4 +166,5 @@ function init() {
     spaceball = new TrackballRotator(canvas, draw, 0);
 
     draw();
+    animate();
 }
