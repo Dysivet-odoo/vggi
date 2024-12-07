@@ -81,6 +81,7 @@ function Model(name) {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices.vertexListV), gl.STREAM_DRAW);
 
         this.count = vertices.vertexListU.length/3;
+        
     }
 
     this.Draw = function() {
