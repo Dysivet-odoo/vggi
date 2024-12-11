@@ -108,7 +108,7 @@ function initGL(count_u, count_v) {
 
     surface = new Model('Surface', count_u, count_v);
     surface.BufferData();
-    surface.loadTexture();
+    surface.loadTextures();
 
     gl.enable(gl.DEPTH_TEST);
 }

@@ -183,7 +183,7 @@ function Model(name, count_u, count_v) {
             }
         }
 
-        this.calculateNormals(vertexList, triangleList);
+        this.calculateNormals(vertexList);
         this.calcTexCoords(texCoordsList);
         this.calcTangent(tangentList);
 
@@ -215,7 +215,7 @@ function Model(name, count_u, count_v) {
         return {verticesF32, indicesU16, vertexNormalsF32, texCoordsList, tangentList};
     }
 
-    this.calculateNormals = function(vertexList, triangleList){
+    this.calculateNormals = function(vertexList){
         for (let i=0; i<vertexList.length; i++){
             let vertex = vertexList[i];
             let p0 = vertex.p;
@@ -264,7 +264,7 @@ function Model(name, count_u, count_v) {
         }
     }
 
-    this.loadTexture = function(){
+    this.loadTextures = function(){
         //Diffuse
         gl.bindTexture(gl.TEXTURE_2D, this.textureDiffuse);
 		gl.texImage2D(
