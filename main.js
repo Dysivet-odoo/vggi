@@ -76,7 +76,7 @@ function draw() {
     gl.uniformMatrix4fv(shProgram.inormalMatrix, false, normalMatrix );
 
     //updateLightPosition();
-    gl.uniform3fv(shProgram.iLightSource, [0.0, 20.0, 20.0]); 
+    gl.uniform3fv(shProgram.iLightSource, [0.0, 10.0, 0.0]); 
     
     /* Draw the six faces of a cube, with different colors. */
     gl.uniform4fv(shProgram.iColor, [1,1,0,1] );

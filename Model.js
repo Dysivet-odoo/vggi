@@ -357,15 +357,15 @@ function Model(name, count_u, count_v) {
     this.bindTextures = function(){
         gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this.textureDiffuse);
-		gl.uniform1i(shProgram.diffuseTextureUni, 0);
+		gl.uniform1i(shProgram.idiffuseTexture, 0);
 
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, this.textureSpecular);
-		gl.uniform1i(shProgram.specularTextureUni, 1);
+		gl.uniform1i(shProgram.ispecularTexture, 1);
 
 		gl.activeTexture(gl.TEXTURE2);
 		gl.bindTexture(gl.TEXTURE_2D, this.textureNormal);
-		gl.uniform1i(shProgram.normalTextureUni, 2);
+		gl.uniform1i(shProgram.inormalTexture, 2);
     }
 
 }
