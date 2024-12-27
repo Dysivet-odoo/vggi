@@ -1,12 +1,9 @@
-
-
 // Vertex shader
 const vertexShaderSource = `
 attribute vec3 vertex;
 attribute vec3 normal;
 attribute vec2 texCoord;
 attribute vec3 tangent;
-
 
 uniform vec2 offset;
 uniform float angle;
@@ -25,13 +22,10 @@ void main() {
     vec4 pos = ModelViewProjectionMatrix * vec4(vertex,1.0);
     var_position = pos.xyz;
 
-    vec2 tmp_point = texCoord - point;
-                
-    float c = cos(angle);
-    float s = sin(angle);
+    vec2 tmp_point = texCoord;
 
-    float tmp_u = tmp_point[0] * c - tmp_point[1] * s + point[0];
-    float tmp_v = tmp_point[0] * s + tmp_point[1] * c + point[1];
+    float tmp_u = tmp_point[0] * cos(angle) - tmp_point[1] * sin(angle) + point[0];
+    float tmp_v = tmp_point[0] * sin(angle) + tmp_point[1] * cos(angle) + point[1];
 
     tmp_u += offset[0];
     tmp_v += offset[1];
