@@ -31,7 +31,7 @@ void main() {
     float s = sin(angle);
 
     float tmp_u = tmp_point[0] * c - tmp_point[1] * s + point[0];
-    float tmp_v = tmp_point[0] * s - tmp_point[1] * c + point[1];
+    float tmp_v = tmp_point[0] * s + tmp_point[1] * c + point[1];
 
     tmp_u += offset[0];
     tmp_v += offset[1];
