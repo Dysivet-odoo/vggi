@@ -92,6 +92,10 @@ function Model(name, count_u, count_v) {
     this.iTangentBuffer = gl.createBuffer();
     this.count = 0;
 
+    this.point = [0,0];
+    this.angle = 0.0;
+    this.offset = [0,0];
+
     this.textureDiffuse = gl.createTexture();
     this.textureNormal = gl.createTexture();
     this.textureSpecular = gl.createTexture();
@@ -105,6 +109,17 @@ function Model(name, count_u, count_v) {
     this.u_polylines = getPolylines(U_SPACE[0], this.COUNT_POINTS_U, this.STEP_U);
     this.v_polylines = getPolylines(V_SPACE[0], this.COUNT_POINTS_V, this.STEP_V);
 
+    this.movePoint = function(delta){
+        this.point[0] += delta[0];
+        this.point[1] += delta[1];
+
+        this.point[0] = this.point[0] % 1;
+        this.point[1] = this.point[1] % 1;
+    }
+
+    this.changeAngle = function(deltaAngle){
+        this.angle += deg2rad(deltaAngle);
+    }
 
     this.BufferData = function() {
         let data = this.CreateSurfaceData(this.u_polylines, this.v_polylines);
@@ -251,7 +266,19 @@ function Model(name, count_u, count_v) {
     this.calcTexCoords = function(texCoordsList){
         for(let u=0; u < this.COUNT_POINTS_U; u++){
             for(let v=0; v < this.COUNT_POINTS_V; v++){
-                texCoordsList.push(u / this.COUNT_POINTS_U, v / this.COUNT_POINTS_V);
+                // let tmp_u = u / this.COUNT_POINTS_U - this.point[0];
+                // let tmp_v = v / this.COUNT_POINTS_V - this.point[1];
+                
+                // let c = Math.cos(this.angle);
+                // let s = Math.sin(this.angle);
+
+                // tmp_u = tmp_u * c - tmp_v * s + this.point[0];
+                // tmp_v = tmp_u * s - tmp_v * c + this.point[1];
+
+                let tmp_u = u / this.COUNT_POINTS_U;
+                let tmp_v = v / this.COUNT_POINTS_V;
+
+                texCoordsList.push(tmp_u, tmp_v);
             }
         }
     }

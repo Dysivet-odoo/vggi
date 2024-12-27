@@ -8,6 +8,8 @@ let spaceball;                  // A SimpleRotator object that lets the user rot
 
 let lightAngle = 0; 
 let lightRadius = 20.0; 
+let step_move = 0.01;
+let step_angle = 15; // deg
 
 function updateLightPosition() { 
     lightAngle += 0.01; 
@@ -77,6 +79,10 @@ function draw() {
 
     //updateLightPosition();
     gl.uniform3fv(shProgram.iLightSource, [0.0, 10.0, 0.0]); 
+
+    gl.uniform2fv(shProgram.ipoint, surface.point);
+    gl.uniform2fv(shProgram.ioffset, surface.offset);
+    gl.uniform1f(shProgram.iangle, surface.angle);
     
     /* Draw the six faces of a cube, with different colors. */
     gl.uniform4fv(shProgram.iColor, [1,1,0,1] );
@@ -105,6 +111,9 @@ function initGL(count_u, count_v) {
     shProgram.ispecularTexture           = gl.getUniformLocation(prog, "specularTexture");
     shProgram.inormalTexture             = gl.getUniformLocation(prog, "normalTexture");
     shProgram.inormalMatrix              = gl.getUniformLocation(prog, "normalMatrix");
+    shProgram.ipoint                     = gl.getUniformLocation(prog, "point");
+    shProgram.ioffset                    = gl.getUniformLocation(prog, "offset");
+    shProgram.iangle                     = gl.getUniformLocation(prog, "angle");
 
     surface = new Model('Surface', count_u, count_v);
     surface.BufferData();
@@ -145,6 +154,53 @@ function createProgram(gl, vShader, fShader) {
     return prog;
 }
 
+function updateData() {
+	const point = document.getElementById("point");
+	const angle = document.getElementById("angle");
+
+	point.textContent = `(${surface.offset[0].toFixed(2)}, ${surface.offset[1].toFixed(2)})`;
+	angle.textContent = surface.angle.toFixed(2);
+}
+
+function handleKeyDown(event) {
+	switch (event.key) {
+		case "a":
+		case "A":
+            surface.offset[0] -= step_move;
+            surface.offset[0] = surface.offset[0] % 1;
+			break;
+		case "d":
+		case "D":
+			surface.offset[0] += step_move;
+            surface.offset[0] = surface.offset[0] % 1;
+			break;
+		case "w":
+		case "W":
+			surface.offset[1] += step_move;
+            surface.offset[1] = surface.offset[1] % 1;
+			break;
+		case "s":
+		case "S":
+			surface.offset[1] -= step_move;
+            surface.offset[1] = surface.offset[1] % 1;
+			break;
+		case "q":
+		case "Q":
+			surface.changeAngle(step_angle);
+			// surface.BufferData();
+            // surface.loadTextures();
+			break;
+        case "e":
+        case "E":
+            surface.changeAngle(-step_angle);
+            // surface.BufferData();
+            // surface.loadTextures();
+            break;
+	}
+	updateData();
+	draw();
+}
+
 
 /**
  * initialization function that will be called when the page has loaded
@@ -177,5 +233,7 @@ function init() {
     spaceball = new TrackballRotator(canvas, draw, 0);
 
     draw();
+    window.addEventListener("keydown", handleKeyDown);
     //animate();
 }
+document.addEventListener("DOMContentLoaded", init);
